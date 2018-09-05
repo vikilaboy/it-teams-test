@@ -15,11 +15,6 @@ services:
             - PHP_MEM_LIMIT=512M
             - PHP_POST_MAX_SIZE=512M
             - PHP_UPLOAD_MAX_FILESIZE=512M
-            - MYSQL_HOST=${DB_HOST}
-            - MYSQL_PORT=3306
-            - MYSQL_DBNAME=${DB_DBNAME}
-            - MYSQL_USER=${DB_USER}
-            - MYSQL_PASSWORD=${DB_PASS}
         labels:
             - "traefik.enable=false"
         logging:

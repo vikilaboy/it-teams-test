@@ -24,10 +24,6 @@ RUN usermod -u 1000 www-data && \
 # Injecting assets
 ADD etc /etc
 
-RUN chmod 400 /etc/nginx/certs/cert.key
-RUN chmod 400 /etc/nginx/certs/cloudflare.crt
-RUN chmod 400 /etc/nginx/certs/key.pem
-
 # Environment parameters substitution & Nginx start
 CMD envsubst '\$SERVER_NAME,\$PHP_FPM_SOCK,\$PHP_POST_MAX_SIZE' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf \
     && nginx -g 'daemon off;'
