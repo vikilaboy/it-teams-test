@@ -1,8 +1,9 @@
 {
-    "require": {
-        "kubrey/amazon-advertising-api-php-sdk": "^1.2",
-        "symfony/var-dumper": "^4.2@dev",
-        "symfony/dotenv": "^4.0",
-        "nesbot/carbon": "^2.0"
-    }
+  "require": {
+    "php": ">=7",
+    "kubrey/amazon-advertising-api-php-sdk": "^1.2",
+    "symfony/var-dumper": "^4.2@dev",
+    "symfony/dotenv": "^4.0",
+    "nesbot/carbon": "^2.0"
+  }
 }
