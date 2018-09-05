@@ -1,0 +1,58 @@
+server {
+    listen     80;
+
+    server_name ${SERVER_NAME};
+
+    client_max_body_size  ${PHP_POST_MAX_SIZE};
+
+    proxy_connect_timeout 300;
+    proxy_send_timeout    300;
+    proxy_read_timeout    300;
+    send_timeout          300;
+
+    # Document root, make sure this points to correct directory
+    root        /var/www/html/public;
+
+    # Default index file & charset
+    index       index.php index.html;
+    charset     utf-8;
+
+    # Load global configurations
+    include     conf.d/global/*.conf;
+
+    # Add stdout logging
+    error_log   /dev/stdout error;
+    access_log  Off;
+    
+    location / {
+        # This is cool because no php is touched for static content
+        try_files $uri @rewrite;
+    }
+
+    location @rewrite {
+        # Some modules enforce no slash (/) at the end of the URL
+        # Else this rewrite block wouldn't be needed (GlobalRedirect)
+        rewrite ^/(.*)$ /index.php/$1 last;
+    }
+
+    # PROD
+    location ~ ^/index\.php(/|$) {
+        #if (!-f $document_root$fastcgi_script_name) {
+        #    return 404;
+        #}
+    
+        fastcgi_pass            ${PHP_FPM_SOCK};
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+        include                 fastcgi.conf;
+        fastcgi_param           SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param           HTTPS off;
+        fastcgi_param           PHP_VALUE "upload_max_filesize=${PHP_POST_MAX_SIZE}
+        post_max_size=${PHP_POST_MAX_SIZE}";
+
+        # Prevents URIs that include the front controller. This will 404:
+        # http://domain.tld/index.php/some-path
+        # Remove the internal directive to allow URIs like this
+        #internal;
+    }
+}

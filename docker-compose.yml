@@ -1,0 +1,66 @@
+version: '3.6'
+
+services:
+    php-fpm:
+        env_file: ./.env
+        build: ./.docker/php-fpm
+        container_name: it-teams-php-fpm
+        restart: always
+        volumes:
+            - ./:/var/www/html:cached
+        environment:
+            - TZ=Europe/Bucharest
+            - PHP_DISPLAY_ERRORS=0
+            - PHP_OPCACHE_ENABLED=0
+            - PHP_MEM_LIMIT=512M
+            - PHP_POST_MAX_SIZE=512M
+            - PHP_UPLOAD_MAX_FILESIZE=512M
+            - MYSQL_HOST=${DB_HOST}
+            - MYSQL_PORT=3306
+            - MYSQL_DBNAME=${DB_DBNAME}
+            - MYSQL_USER=${DB_USER}
+            - MYSQL_PASSWORD=${DB_PASS}
+        labels:
+            - "traefik.enable=false"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        hostname: php-fpm.it-teams.ro
+        networks:
+            - backend
+
+    nginx:
+        env_file: ./.env
+        build: ./.docker/nginx
+        container_name: it-teams-nginx
+        restart: always
+        labels:
+            - "traefik.backend=${APP_HOST}"
+            - "traefik.port=80"
+            - "traefix.port=443"
+            - "traefik.frontend.entryPoints=http,https"
+            - "traefik.frontend.rule=HostRegexp:${APP_HOST},{subdomain:[a-z]+}.${APP_HOST}"
+            - "traefik.docker.network=traefik_webgateway"
+        environment:
+            - PHP_FPM_SOCK=php-fpm:9000
+            - PHP_POST_MAX_SIZE=512M
+            - SERVER_NAME=${APP_HOST}
+        depends_on:
+            - php-fpm
+        volumes:
+            - ./:/var/www/html
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        hostname: nginx.it-teams.ro
+        networks:
+            - backend
+            - traefik
+networks:
+    traefik:
+      external:
+        name: traefik_webgateway
+    backend:
+        driver: bridge
