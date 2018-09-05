@@ -4,3 +4,5 @@
 vendor
 public/*
 !public/index.php
+!public/reports.json
+!public/result.json
