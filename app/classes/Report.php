@@ -13,7 +13,7 @@ class Report extends Cli
 
     protected $profileId = '2698078355751396';
 
-    protected $metrics = [
+    protected $campaignMetrics = [
         'bidPlus',
         'campaignName',
         'campaignId',
@@ -42,6 +42,26 @@ class Report extends Cli
         'attributedSales7dSameSKU',
         'attributedSales14dSameSKU',
         'attributedSales30dSameSKU',
+    ];
+
+    protected $hsaMetrics = [
+        'campaignName',
+        'campaignId',
+        'campaignType',
+        'campaignStatus',
+        'campaignBudget',
+        'campaignBudgetType',
+        //'adGroupName',
+        //'adGroupId',
+        //'keywordText',
+        //'matchType',
+        'impressions',
+        'clicks',
+        'cost',
+        'attributedSales14d',
+        'attributedSales14dSameSKU',
+        'attributedConversions14d',
+        'attributedConversions14dSameSKU'
     ];
 
     protected $days = 14;
@@ -115,7 +135,7 @@ class Report extends Cli
             [
                 'campaignType' => self::CAMPAIGN_TYPE_HSA,
                 'reportDate' => Carbon::now()->subDays($this->days)->format('Ymd'),
-                'metrics' => implode(',', $this->metrics),
+                'metrics' => implode(',', $this->hsaMetrics),
             ]
         );
     }
@@ -130,6 +150,6 @@ class Report extends Cli
         $response = $this->client->getReport($params['id']);
         $report = json_decode($response['response'], true);
 
-        return $this->csv($report, $this->metrics);
+        return $this->csv($report, $this->hsaMetrics);
     }
 }
